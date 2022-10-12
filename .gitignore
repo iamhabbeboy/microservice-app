@@ -1,0 +1,6 @@
+db-data1/
+frontend-service/node_modules
+listener-service/listenerApp
+broker-service/brokerApp
+logger-service/loggerApp
+vendor/*
