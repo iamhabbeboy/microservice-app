@@ -8,6 +8,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const (
+	port     = "80"
+	mongoURL = "mongodb://mongo:27017"
+)
+
 func main() {
 	e := echo.New()
 	e.GET("/", func(c echo.Context) error {

@@ -6,6 +6,8 @@ services:
       dockerfile: frontend-service.dockerfile
     ports:
       - "80:8080"
+    networks:
+      - app-network
   logger-service:
     build: 
       context: ./logger-service
@@ -20,7 +22,9 @@ services:
       dockerfile: broker-service.dockerfile
     ports:
       - "8083:1323"
-  auth-service:
+    networks:
+      - app-network
+  php:
     build:
       context: ./auth-service
       dockerfile: auth-service.dockerfile
@@ -30,7 +34,7 @@ services:
       - "9000:9000"
     networks:
       - app-network
-  nginx:
+  auth-service:
     image: nginx:alpine
     restart: unless-stopped
     ports:
@@ -39,7 +43,7 @@ services:
       - ./auth-service:/var/www
       - ./auth-service/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
     depends_on:
-      - auth-service
+      - php
     networks:
       - app-network
   zookeeper:

@@ -46,17 +46,14 @@ func HandleRequest(c echo.Context) error {
 	return c.JSON(http.StatusOK, statusResponse(false, "This is from broker"))
 }
 
-func statusResponse(status bool, err string) JsonResponse {
-	return JsonResponse{
-		Error:   status,
-		Message: err,
-	}
-}
-
 func authentication(data AuthPayload) JsonResponse {
-	j, _ := json.MarshalIndent(data, "", "\t")
+	// j, _ := json.MarshalIndent(data, "", "\t")
+	js, err := json.Marshal(data)
+	if err != nil {
+		return statusResponse(false, err.Error())
+	}
 	// call the service
-	request, err := http.NewRequest("POST", "http://auth-service/api/", bytes.NewBuffer(j))
+	request, err := http.NewRequest("POST", "http://auth-service/api/", bytes.NewBuffer(js))
 	if err != nil {
 		return statusResponse(false, err.Error())
 	}
@@ -85,7 +82,7 @@ func authentication(data AuthPayload) JsonResponse {
 
 	var p JsonResponse
 	p.Error = false
-	p.Message = "Authenticated!"
+	p.Message = "Authenticated!:"
 	p.Data = jsonResponse.Data
 
 	return p

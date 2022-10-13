@@ -7,15 +7,18 @@
           <div class="w-6/12 h-64">
             <h3 class="font-bold">Payload</h3>
             <div class="w-full h-full bg-gray-200">
-                {
-                  action: "broker"
+                <pre class="whitespace-pre-line">{
+                  action: "auth"
                 }
+                </pre>
             </div>
           </div>
           <div class="w-6/12">
             <h3 class="font-bold">Output</h3>
                <div class="w-full h-full bg-gray-400">
-                sdlfkdjf
+                <pre class="whitespace-pre-line">
+                {{response}}
+                </pre>
             </div>
           </div>
         </div>
@@ -31,21 +34,25 @@
 
 <script>
  import axios from 'axios'
+ import { ref } from 'vue'
 export default{
   setup() {
+    const response = ref()
     const handleAuth = async () => {
       const payload = {
         action: "auth",
         auth: {
           email: "admin@gmail.com",
-          password: "verysecret"
+          password: "verify"
         }
       }
       const res = await axios.post('http://localhost:8083', payload)
-      console.log(res)
+      response.value = res.data
+      console.log(res.data)
     }
 
     return {
+      response,
       handleAuth,
     }
   },
