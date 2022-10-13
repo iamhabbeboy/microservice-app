@@ -1,6 +1,6 @@
 <template>
-  <div class="">
-    <div class="w-full md:w-1/2 mx-auto mt-10">
+  <div class="bg-red-100">
+    <div class="w-10/12 mx-auto mt-10">
       <h1 class="text-2xl border-b-2">Home</h1>
       <div>
         <div class="flex mt-4">
