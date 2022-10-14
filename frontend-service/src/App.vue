@@ -4,9 +4,9 @@
       <h1 class="text-2xl border-b-2">Microservice with Kafka</h1>
       <div>
         <div class="flex mt-4">
-          <div class="w-6/12 h-64">
+          <div class="w-6/12">
             <h3 class="font-bold">Payload</h3>
-            <div class="w-full h-full bg-gray-200">
+            <div class="w-full bg-gray-200" style="height:500px;">
                 <pre class="whitespace-pre-line">{
                   action: "auth"
                 }
@@ -15,8 +15,9 @@
           </div>
           <div class="w-6/12">
             <h3 class="font-bold">Output</h3>
-               <div class="w-full h-full border">
-                <pre class="whitespace-pre-line">
+               <div class="w-full border overflow-y-auto break-words" style="height:500px;">
+                <pre class="whitespace-pre-line p-4">
+                  &nbsp;
                 {{response}}
                 </pre>
             </div>
@@ -56,7 +57,7 @@ export default{
         action: "log",
         log: {
           name: "frontend",
-          data: "This is a log"
+          data: "This is a log from frontend"
         }
       }
       const res = await axios.post('http://localhost:8083', payload)

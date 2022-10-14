@@ -43,11 +43,11 @@ func (m *Models) Create(entry LogEntry) error {
 	return nil
 }
 
-func (m *Models) Read() string {
+func (m *Models) Read() ([]byte, error) {
 	data, err := ioutil.ReadFile(m.logFileName)
 	if err != nil {
-		return err.Error()
+		return nil, err
 	}
 
-	return string(data)
+	return data, nil
 }

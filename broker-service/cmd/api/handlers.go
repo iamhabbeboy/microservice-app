@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -33,6 +34,8 @@ type JsonResponse struct {
 }
 
 func HandleHealthTest(c echo.Context) error {
+	ctx := context.Background()
+	Producer(ctx)
 	return c.String(http.StatusOK, "All is well from Broker")
 }
 
@@ -98,7 +101,7 @@ func authentication(data AuthPayload) JsonResponse {
 }
 
 func logger(log LoggerPayload) JsonResponse {
-	j, err := json.Marshal(log)
+	j, err := json.MarshalIndent(log, "", "\t")
 	if err != nil {
 		return statusResponse(false, errors.New("Unable to marshal data").Error())
 	}
@@ -125,9 +128,10 @@ func logger(log LoggerPayload) JsonResponse {
 		return statusResponse(false, jsonResp.Message)
 	}
 
-	return JsonResponse{
-		Error:   false,
-		Data:    jsonResp.Data,
-		Message: jsonResp.Message,
-	}
+	var p JsonResponse
+	p.Error = false
+	p.Message = jsonResp.Message
+	p.Data = jsonResp.Data
+
+	return p
 }

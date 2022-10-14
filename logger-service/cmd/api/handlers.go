@@ -17,7 +17,7 @@ type RequestPayload struct {
 type JsonResponse struct {
 	Error   bool   `json:"error"`
 	Message string `json:"message"`
-	Data    string `json:"data"`
+	Data    any    `json:"data"`
 }
 
 func HandleRequest(c echo.Context) error {
@@ -40,12 +40,20 @@ func HandleRequest(c echo.Context) error {
 		}
 		return c.JSON(http.StatusBadRequest, resp)
 	}
+	r, err := model.Read()
+	if err != nil {
+		resp := JsonResponse{
+			Error:   true,
+			Message: err.Error(),
+		}
+		return c.JSON(http.StatusBadRequest, resp)
+	}
 
 	resp := JsonResponse{
 		Error:   false,
-		Data:    string(model.Read()),
+		Data:    string(r),
 		Message: "logged",
 	}
 
-	return c.JSON(http.StatusOK, resp)
+	return c.JSON(http.StatusAccepted, resp)
 }
