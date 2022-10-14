@@ -12,12 +12,18 @@ import (
 type RequestPayload struct {
 	Action string `json:"action"`
 	Auth   AuthPayload
+	Log    LoggerPayload
 }
 
 // payload for auth
 type AuthPayload struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
+}
+
+type LoggerPayload struct {
+	Name string `json:"name"`
+	Data string `json:"data"`
 }
 
 type JsonResponse struct {
@@ -39,6 +45,8 @@ func HandleRequest(c echo.Context) error {
 	switch params.Action {
 	case "auth":
 		return c.JSON(http.StatusAccepted, authentication(params.Auth))
+	case "log":
+		return c.JSON(http.StatusAccepted, logger(params.Log))
 	default:
 		return c.JSON(http.StatusOK, statusResponse(false, errors.New("unknown action").Error()))
 	}
@@ -47,13 +55,14 @@ func HandleRequest(c echo.Context) error {
 }
 
 func authentication(data AuthPayload) JsonResponse {
-	// j, _ := json.MarshalIndent(data, "", "\t")
-	js, err := json.Marshal(data)
+	js, err := json.MarshalIndent(data, "", "\t")
+	// js, err := json.Marshal(data)
 	if err != nil {
 		return statusResponse(false, err.Error())
 	}
 	// call the service
 	request, err := http.NewRequest("POST", "http://auth-service/api/", bytes.NewBuffer(js))
+	request.Header.Set("content-type", "application/json")
 	if err != nil {
 		return statusResponse(false, err.Error())
 	}
@@ -86,4 +95,39 @@ func authentication(data AuthPayload) JsonResponse {
 	p.Data = jsonResponse.Data
 
 	return p
+}
+
+func logger(log LoggerPayload) JsonResponse {
+	j, err := json.Marshal(log)
+	if err != nil {
+		return statusResponse(false, errors.New("Unable to marshal data").Error())
+	}
+	uri := "http://logger-service:1323/log"
+	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(j))
+	req.Header.Set("content-type", "application/json")
+	if err != nil {
+		return statusResponse(false, err.Error())
+	}
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return statusResponse(false, err.Error())
+	}
+	defer resp.Body.Close()
+
+	var jsonResp JsonResponse
+	err = json.NewDecoder(resp.Body).Decode(&jsonResp)
+	if err != nil {
+		return statusResponse(false, errors.New("unable to decode response").Error())
+	}
+
+	if resp.StatusCode != http.StatusAccepted {
+		return statusResponse(false, jsonResp.Message)
+	}
+
+	return JsonResponse{
+		Error:   false,
+		Data:    jsonResp.Data,
+		Message: jsonResp.Message,
+	}
 }

@@ -15,7 +15,7 @@
           </div>
           <div class="w-6/12">
             <h3 class="font-bold">Output</h3>
-               <div class="w-full h-full bg-gray-400">
+               <div class="w-full h-full border">
                 <pre class="whitespace-pre-line">
                 {{response}}
                 </pre>
@@ -25,7 +25,7 @@
         <div class="mt-10">
            <button class="mr-3 p-3 bg-green-600 rounded-md text-white hover:bg-green-500" @click="handleAuth">Test Auth</button>
           <button class="mr-3 p-3 bg-blue-600 rounded-md text-white hover:bg-blue-500">Test Broker</button>
-          <button class="mr-3 p-3 bg-purple-600 rounded-md  text-white hover:bg-purple-500">Test Logger</button>
+          <button class="mr-3 p-3 bg-purple-600 rounded-md  text-white hover:bg-purple-500" @click="handleLog">Test Logger</button>
         </div>
       </div>
     </div>
@@ -51,9 +51,23 @@ export default{
       console.log(res.data)
     }
 
+    const handleLog = async () => {
+      const payload = {
+        action: "log",
+        log: {
+          name: "frontend",
+          data: "This is a log"
+        }
+      }
+      const res = await axios.post('http://localhost:8083', payload)
+      response.value = res.data
+      console.log(res.data)
+    }
+
     return {
       response,
       handleAuth,
+      handleLog,
     }
   },
 }

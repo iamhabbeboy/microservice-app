@@ -12,6 +12,8 @@ services:
     build: 
       context: ./logger-service
       dockerfile: logger-service.dockerfile
+    networks:
+      - app-network
   listener-service:
     build: 
       context: ./listener-service
