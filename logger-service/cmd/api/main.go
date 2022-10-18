@@ -18,5 +18,7 @@ func main() {
 		return c.String(http.StatusAccepted, "OK")
 	})
 	e.POST("/log", HandleRequest)
+
+	e.GET("/logs", HandleLogs)
 	e.Logger.Fatal(e.Start(":1323"))
 }

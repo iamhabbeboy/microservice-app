@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -30,8 +31,6 @@ func HandleRequest(c echo.Context) error {
 		Data: params.Data,
 	})
 
-	// return c.JSON(http.StatusBadRequest, resp)
-
 	resp := JsonResponse{
 		Error:   false,
 		Data:    "sdfdf",
@@ -39,4 +38,22 @@ func HandleRequest(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusAccepted, resp)
+}
+
+func HandleLogs(c echo.Context) error {
+	mongo := NewMongoClient()
+	data, err := mongo.GetAll()
+	if err != nil {
+		return c.JSON(http.StatusBadGateway, err.Error())
+	}
+	j, err := json.Marshal(data)
+	if err != nil {
+		return c.JSON(http.StatusBadGateway, err.Error())
+	}
+	resp := JsonResponse{
+		Error:   false,
+		Data:    j,
+		Message: "logs",
+	}
+	return c.JSON(http.StatusOK, resp)
 }

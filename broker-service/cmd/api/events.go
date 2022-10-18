@@ -74,11 +74,5 @@ func (e *Event) Get() {
 		}
 
 		fmt.Println("Data received: ", string(msg.Value))
-		// insertResult, err := collection.InsertOne(context.Background(), msg)
-		// if err != nil {
-		// 	log.Fatal(err)
-		// }
-
-		// fmt.Println("Inserted a single document: ", insertResult.InsertedID)
 	}
 }

@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -46,10 +45,11 @@ func HandleRequest(c echo.Context) error {
 
 	switch params.Action {
 	case "auth":
-		// return c.JSON(http.StatusAccepted, authWithKafka(params.Auth))
 		return c.JSON(http.StatusAccepted, authentication(params.Auth))
 	case "log":
 		return c.JSON(http.StatusAccepted, logger(params.Log))
+	case "logs":
+		return c.JSON(http.StatusAccepted, getLogs())
 	case "broker":
 		return c.JSON(http.StatusOK, statusResponse(false, "This is from broker"))
 	default:
@@ -57,20 +57,30 @@ func HandleRequest(c echo.Context) error {
 	}
 }
 
-func authWithKafka(data AuthPayload) JsonResponse {
-	d := Payload{
-		Name: "auth",
-		Data: data,
+func getLogs() JsonResponse {
+	// call the service
+	resp, err := http.Get("http://logger-service")
+	if err != nil {
+		return statusResponse(true, err.Error())
 	}
-	fmt.Println(d)
-	// ctx := context.Background()
-	// evt := NewEvent("auth")
-	// evt.PushToQueue(ctx, d)
+	defer resp.Body.Close()
 
-	return JsonResponse{
-		Error:   false,
-		Message: "Auth Hit",
+	if resp.StatusCode != http.StatusOK {
+		return statusResponse(true, errors.New("Error occured").Error())
 	}
+
+	var jsonResponse JsonResponse
+	err = json.NewDecoder(resp.Body).Decode(&jsonResponse)
+	if err != nil {
+		return statusResponse(true, err.Error())
+	}
+
+	var p JsonResponse
+	p.Error = false
+	p.Message = jsonResponse.Message
+	p.Data = jsonResponse.Data
+
+	return p
 }
 
 func authentication(data AuthPayload) JsonResponse {

@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -72,4 +73,31 @@ func (m *MongoClient) Save(data Payload) (any, error) {
 	}
 
 	return res.InsertedID, nil
+}
+
+func (m *MongoClient) GetAll() ([]LogEntry, error) {
+	findOptions := options.Find()
+	findOptions.SetLimit(10)
+	var results []LogEntry
+
+	cur, err := m.collection.Find(context.TODO(), bson.D{{}}, findOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for cur.Next(context.TODO()) {
+		//Create a value into which the single document can be decoded
+		var log LogEntry
+		err := cur.Decode(&log)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, log)
+	}
+	if err := cur.Err(); err != nil {
+		log.Fatal(err)
+	}
+	cur.Close(context.TODO())
+
+	return results, nil
 }

@@ -25,7 +25,7 @@
         </div>
         <div class="mt-10">
            <button class="mr-3 p-3 bg-green-600 rounded-md text-white hover:bg-green-500" @click="handleAuth">Test Auth</button>
-          <button class="mr-3 p-3 bg-blue-600 rounded-md text-white hover:bg-blue-500">Test Broker</button>
+          <button class="mr-3 p-3 bg-blue-600 rounded-md text-white hover:bg-blue-500" @click="handleGetLogs">Get Logs</button>
           <button class="mr-3 p-3 bg-purple-600 rounded-md  text-white hover:bg-purple-500" @click="handleLog">Test Logger</button>
         </div>
       </div>
@@ -47,9 +47,12 @@ export default{
           password: "verify"
         }
       }
-      const res = await axios.post('http://localhost:8083', payload)
-      response.value = res.data
-      console.log(res.data)
+      try {
+        const res = await axios.post('http://localhost:8083', payload)
+        response.value = res.data
+      }catch(error) {
+        response.value = error
+      }
     }
 
     const handleLog = async () => {
@@ -62,6 +65,16 @@ export default{
       }
       const res = await axios.post('http://localhost:8083', payload)
       response.value = res.data
+    }
+
+    const handleGetLogs = async () => {
+      const payload = {
+        action: "logs",
+        log: {
+        }
+      }
+      const res = await axios.post('http://localhost:8083', payload)
+      response.value = res.data
       console.log(res.data)
     }
 
@@ -69,6 +82,7 @@ export default{
       response,
       handleAuth,
       handleLog,
+      handleGetLogs,
     }
   },
 }

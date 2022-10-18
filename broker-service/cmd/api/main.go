@@ -5,16 +5,6 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-// Handles all request
-// Specify request payload struct/standard
-// switch case action sent in
-//
-// Call logger service endpoint to log request
-// Send request to kafka/listener
-// Return response
-
-// Logs data to Mongodb
-
 func main() {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

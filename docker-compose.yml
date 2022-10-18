@@ -12,6 +12,8 @@ services:
     build: 
       context: ./logger-service
       dockerfile: logger-service.dockerfile
+    ports:
+      - "8084:1323"
     networks:
       - app-network
   listener-service:
@@ -42,6 +44,8 @@ services:
     build:
       context: ./auth-service
       dockerfile: auth-service.dockerfile
+    env_file:
+      - auth-service/auth.env
     volumes:
       - ./auth-service:/var/www
     ports:
