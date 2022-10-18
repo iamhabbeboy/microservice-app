@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -34,8 +35,6 @@ type JsonResponse struct {
 }
 
 func HandleHealthTest(c echo.Context) error {
-	ctx := context.Background()
-	Producer(ctx)
 	return c.String(http.StatusOK, "All is well from Broker")
 }
 
@@ -47,14 +46,31 @@ func HandleRequest(c echo.Context) error {
 
 	switch params.Action {
 	case "auth":
+		// return c.JSON(http.StatusAccepted, authWithKafka(params.Auth))
 		return c.JSON(http.StatusAccepted, authentication(params.Auth))
 	case "log":
 		return c.JSON(http.StatusAccepted, logger(params.Log))
+	case "broker":
+		return c.JSON(http.StatusOK, statusResponse(false, "This is from broker"))
 	default:
 		return c.JSON(http.StatusOK, statusResponse(false, errors.New("unknown action").Error()))
 	}
+}
 
-	return c.JSON(http.StatusOK, statusResponse(false, "This is from broker"))
+func authWithKafka(data AuthPayload) JsonResponse {
+	d := Payload{
+		Name: "auth",
+		Data: data,
+	}
+	fmt.Println(d)
+	// ctx := context.Background()
+	// evt := NewEvent("auth")
+	// evt.PushToQueue(ctx, d)
+
+	return JsonResponse{
+		Error:   false,
+		Message: "Auth Hit",
+	}
 }
 
 func authentication(data AuthPayload) JsonResponse {
@@ -101,37 +117,17 @@ func authentication(data AuthPayload) JsonResponse {
 }
 
 func logger(log LoggerPayload) JsonResponse {
-	j, err := json.MarshalIndent(log, "", "\t")
-	if err != nil {
-		return statusResponse(false, errors.New("Unable to marshal data").Error())
+	evt := NewEvent(context.Background(), "")
+	data := Payload{
+		Name: log.Name,
+		Data: log.Data,
 	}
-	uri := "http://logger-service:1323/log"
-	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(j))
-	req.Header.Set("content-type", "application/json")
-	if err != nil {
-		return statusResponse(false, err.Error())
-	}
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return statusResponse(false, err.Error())
-	}
-	defer resp.Body.Close()
-
-	var jsonResp JsonResponse
-	err = json.NewDecoder(resp.Body).Decode(&jsonResp)
-	if err != nil {
-		return statusResponse(false, errors.New("unable to decode response").Error())
-	}
-
-	if resp.StatusCode != http.StatusAccepted {
-		return statusResponse(false, jsonResp.Message)
-	}
+	evt.Set(data)
 
 	var p JsonResponse
 	p.Error = false
-	p.Message = jsonResp.Message
-	p.Data = jsonResp.Data
+	p.Message = log.Name
+	p.Data = log.Data
 
 	return p
 }

@@ -18,12 +18,24 @@ services:
     build: 
       context: ./listener-service
       dockerfile: listener-service.dockerfile
+    environment:
+      kafkaURL: kafka:9092
+      topic: topic1
+      groupID: logger-group
+      mongoURL: mongodb://mongo:27017
+      dbName: demo_app
+      collectionName: logger_db
+    networks:
+      - app-network
   broker-service:
     build: 
       context: ./broker-service
       dockerfile: broker-service.dockerfile
     ports:
       - "8083:1323"
+    environment:
+      kafkaURL: kafka:9092
+      topic: topic1
     networks:
       - app-network
   php:
@@ -49,23 +61,33 @@ services:
     networks:
       - app-network
   zookeeper:
-    image: 'bitnami/zookeeper:latest'
+    image: wurstmeister/zookeeper
     ports:
-      - '2181:2181'
-    environment:
-      - ALLOW_ANONYMOUS_LOGIN=yes
+      - "2181:2181"
+    networks:
+      - app-network
   kafka:
-    image: 'bitnami/kafka:3.2'
+    image: wurstmeister/kafka
     ports:
-      - '9092:9092'
+      - "9092:29092"
     environment:
-      - KAFKA_BROKER_ID=1
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CONNECT_BOOTSTRAP_SERVERS: localhost:9092
+      KAFKA_CONNECT_REST_PORT: 8082
+      KAFKA_CONNECT_REST_ADVERTISED_HOST_NAME: "localhost"
+      KAFKA_CONNECT_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      KAFKA_CONNECT_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      KAFKA_CONNECT_KEY_CONVERTER_SCHEMAS_ENABLE: 0
+      KAFKA_CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: 0
+      KAFKA_CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      KAFKA_CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
+      KAFKA_CONNECT_INTERNAL_KEY_CONVERTER_SCHEMAS_ENABLE: 0
+      KAFKA_CONNECT_INTERNAL_VALUE_CONVERTER_SCHEMAS_ENABLE: 0
     depends_on:
       - zookeeper
+    networks:
+      - app-network
   mongo:
     image: 'mongo:4.2.16-bionic'
     ports:
@@ -76,6 +98,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
     volumes:
       - ./db-data1/mongo/:/data/db
-
+    networks:
+      - app-network
 networks:
   app-network:
