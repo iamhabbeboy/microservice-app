@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -59,26 +61,21 @@ func HandleRequest(c echo.Context) error {
 
 func getLogs() JsonResponse {
 	// call the service
-	resp, err := http.Get("http://logger-service")
+	req, err := http.Get("http://logger-service/")
+	fmt.Println(err)
 	if err != nil {
 		return statusResponse(true, err.Error())
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		return statusResponse(true, errors.New("Error occured").Error())
-	}
-
-	var jsonResponse JsonResponse
-	err = json.NewDecoder(resp.Body).Decode(&jsonResponse)
+	defer req.Body.Close()
+	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		return statusResponse(true, err.Error())
 	}
 
 	var p JsonResponse
 	p.Error = false
-	p.Message = jsonResponse.Message
-	p.Data = jsonResponse.Data
+	p.Message = "logged"
+	p.Data = string(body)
 
 	return p
 }
@@ -87,35 +84,35 @@ func authentication(data AuthPayload) JsonResponse {
 	js, err := json.MarshalIndent(data, "", "\t")
 	// js, err := json.Marshal(data)
 	if err != nil {
-		return statusResponse(false, err.Error())
+		return statusResponse(true, err.Error())
 	}
 	// call the service
 	request, err := http.NewRequest("POST", "http://auth-service/api/", bytes.NewBuffer(js))
 	request.Header.Set("content-type", "application/json")
 	if err != nil {
-		return statusResponse(false, err.Error())
+		return statusResponse(true, err.Error())
 	}
 	client := &http.Client{}
 	resp, err := client.Do(request)
 	if err != nil {
-		return statusResponse(false, err.Error())
+		return statusResponse(true, err.Error())
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusUnauthorized {
-		return statusResponse(false, errors.New("invalid credentials").Error())
+		return statusResponse(false, err.Error())
 	} else if resp.StatusCode != http.StatusAccepted {
-		return statusResponse(false, errors.New("error calling auth service").Error())
+		return statusResponse(false, fmt.Sprintf("error calling auth service: %s", err.Error()))
 	}
 
 	var jsonResponse JsonResponse
 	err = json.NewDecoder(resp.Body).Decode(&jsonResponse)
 	if err != nil {
-		return statusResponse(false, err.Error())
+		return statusResponse(true, err.Error())
 	}
 
 	if jsonResponse.Error {
-		return statusResponse(false, string(http.StatusUnauthorized))
+		return statusResponse(true, string(http.StatusUnauthorized))
 	}
 
 	var p JsonResponse

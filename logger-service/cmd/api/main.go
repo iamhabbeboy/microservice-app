@@ -20,5 +20,5 @@ func main() {
 	e.POST("/log", HandleRequest)
 
 	e.GET("/logs", HandleLogs)
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":3500"))
 }

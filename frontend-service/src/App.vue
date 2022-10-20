@@ -70,12 +70,15 @@ export default{
     const handleGetLogs = async () => {
       const payload = {
         action: "logs",
-        log: {
+        logs: {
         }
       }
-      const res = await axios.post('http://localhost:8083', payload)
-      response.value = res.data
-      console.log(res.data)
+      try {
+        const res = await axios.post('http://localhost:8083', payload)
+        response.value = res.data
+      }catch(error) {
+        response.value = error
+      }
     }
 
     return {

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Junges\Kafka\Facades\Kafka;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,5 +15,11 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
+    $message = new Message(
+        headers: ['header-key' => 'header-value'],
+        body: ['key' => 'value'],
+        key: 'kafka key here'  
+    );
+    Kafka::publishOn('topic')->withMessage($message);
     return view('welcome');
 });

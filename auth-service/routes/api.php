@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,29 +14,7 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('/', function(Request $request) {
-    $users = collect([
-        [
-            'email' => 'admin@gmail.com',
-            'password' => 'verify'
-        ],
-        [
-            'email' => 'user@gmail.com',
-            'password' => 'admin'
-        ]
-    ]);
-    $payload = $request->json()->all();
-    $email = $payload['email'];
-    $pass = $payload['password'];
-    
-    $user = $users->where('email', $email)->where('password', $pass);
-
-    if(count($user) === 0) {
-        return response()->json(['message' => 'failed to authenticate', 'error' => true, 'data' => [] ], 401);
-    }
-
-    return response()->json(['message' => 'successful', 'error' => false, 'data' => $user ], 202);
-});
+Route::post('/', AuthController::class);
 
 Route::get('/health-check', function() {
     return response()->json(['status' => 'All is well here from auth']);

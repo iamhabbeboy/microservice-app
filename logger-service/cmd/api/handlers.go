@@ -33,7 +33,7 @@ func HandleRequest(c echo.Context) error {
 
 	resp := JsonResponse{
 		Error:   false,
-		Data:    "sdfdf",
+		Data:    params,
 		Message: "logged",
 	}
 
