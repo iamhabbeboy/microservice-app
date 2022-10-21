@@ -39,13 +39,13 @@ type LogEntry struct {
 }
 
 func HandleHealthTest(c echo.Context) error {
-	return c.String(http.StatusOK, "All is well from Broker")
+	return c.String(http.StatusOK, "OK")
 }
 
 func HandleRequest(c echo.Context) error {
 	params := new(RequestPayload)
 	if err := c.Bind(params); err != nil {
-		return c.JSON(http.StatusOK, statusResponse(false, err.Error()))
+		return c.JSON(http.StatusOK, statusResponse(true, err.Error()))
 	}
 
 	switch params.Action {
@@ -58,7 +58,7 @@ func HandleRequest(c echo.Context) error {
 	case "broker":
 		return c.JSON(http.StatusOK, statusResponse(false, "This is from broker"))
 	default:
-		return c.JSON(http.StatusOK, statusResponse(false, errors.New("unknown action").Error()))
+		return c.JSON(http.StatusOK, statusResponse(true, errors.New("unknown action").Error()))
 	}
 }
 
