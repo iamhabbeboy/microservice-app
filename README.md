@@ -1,4 +1,4 @@
-# microservice demo
+# Microservice demo
 ### Installation
 A Makefile is created to handle the build for all our services
 ```
