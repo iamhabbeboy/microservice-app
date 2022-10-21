@@ -35,9 +35,11 @@ services:
       kafkaURL: kafka:9092
       topic: logger
   php:
+    container_name: php
     build:
       context: ./auth-service
       dockerfile: auth-service.dockerfile
+
     env_file:
       - auth-service/auth.env
     volumes:

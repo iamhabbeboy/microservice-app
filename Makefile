@@ -38,3 +38,5 @@ build_listener:
 	cd ./listener-service && env GOOS=linux CGO_ENABLED=0 go build -o ${LISTENER_APP} ./cmd/api
 	@echo "Done!"
 
+php-shell:
+	docker exec -it php sh
