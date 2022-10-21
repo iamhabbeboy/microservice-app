@@ -6,3 +6,4 @@ logger-service/loggerApp
 auth-service/vendor/*
 .env
 frontend-service/**/.DS_Store
+.idea/

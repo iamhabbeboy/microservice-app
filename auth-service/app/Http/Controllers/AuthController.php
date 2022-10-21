@@ -29,7 +29,7 @@ class AuthController extends Controller
         }
         $this->logger($email);
     
-        return response()->json(['message' => 'successful', 'error' => false, 'data' => $user ], 202);
+        return response()->json(['message' => 'successful', 'error' => false, 'data' => $user->first() ], 202);
     }
 
     private function logger(string $data)
