@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -107,9 +106,9 @@ func authentication(data AuthPayload) JsonResponse {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusUnauthorized {
-		return statusResponse(false, err.Error())
+		return statusResponse(true, "invalid credentials")
 	} else if resp.StatusCode != http.StatusAccepted {
-		return statusResponse(false, fmt.Sprintf("error calling auth service: %s", err.Error()))
+		return statusResponse(true, "error calling auth service: %s")
 	}
 
 	var jsonResponse JsonResponse

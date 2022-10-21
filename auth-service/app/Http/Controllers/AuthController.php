@@ -34,7 +34,7 @@ class AuthController extends Controller
 
     private function logger(string $data)
     {
-        $log = $data . " is logged in";
+        $log = $data . " is logged 🎉";
         // log data here and publish to queue
 
         $payload = [
