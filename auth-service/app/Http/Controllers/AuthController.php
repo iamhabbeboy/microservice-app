@@ -15,7 +15,7 @@ class AuthController extends Controller
             ],
             [
                 'email' => 'user@gmail.com',
-                'password' => 'admin'
+                'password' => 'user'
             ]
         ]);
         $payload = $request->json()->all();

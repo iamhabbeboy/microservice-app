@@ -76,8 +76,6 @@ func (m *MongoClient) Save(data Payload) (any, error) {
 }
 
 func (m *MongoClient) GetAll() ([]LogEntry, error) {
-	// findOptions := options.Find()
-	// findOptions.SetLimit(-1)
 	var results []LogEntry
 
 	cur, err := m.collection.Find(context.TODO(), bson.D{})

@@ -15,9 +15,6 @@ services:
       kafkaURL: kafka:9092
       topic: logger
       groupID: logger-group
-      mongoURL: mongodb://mongo:27017
-      dbName: demo_app
-      collectionName: logger_db
   logger-service:
     build: 
       context: ./logger-service

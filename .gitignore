@@ -5,3 +5,4 @@ broker-service/brokerApp
 logger-service/loggerApp
 auth-service/vendor/*
 .env
+frontend-service/**/.DS_Store

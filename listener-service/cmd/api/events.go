@@ -15,7 +15,6 @@ type Event struct {
 	Topic   string
 	GroupID string
 	Ctx     context.Context
-	mongodb MongoClient
 }
 
 type Payload struct {
@@ -33,7 +32,6 @@ func NewEvent(ctx context.Context, topic string) *Event {
 		Topic:   tp,
 		Ctx:     ctx,
 		GroupID: os.Getenv("groupID"),
-		mongodb: *NewMongoClient(),
 	}
 }
 
@@ -92,10 +90,5 @@ func (e *Event) Get() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		// data, err := e.mongodb.Save(payload)
-		// if err != nil {
-		// 	log.Fatal("Unable:: ", err)
-		// }
-		// fmt.Println("Inserted a single document: ", data)
 	}
 }
