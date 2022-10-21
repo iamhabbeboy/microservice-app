@@ -17,7 +17,7 @@ use App\Http\Controllers\AuthController;
 Route::post('/', AuthController::class);
 
 Route::get('/health-check', function() {
-    return response()->json(['status' => 'All is well here from auth']);
+    return response()->json(['status' => 'OK']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
