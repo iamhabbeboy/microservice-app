@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Junges\Kafka\Facades\Kafka;
-use Junges\Kafka\Message\Message;
 
 class AuthController extends Controller
 {
@@ -38,13 +36,19 @@ class AuthController extends Controller
     {
         $log = $data . " is logged in";
         // log data here and publish to queue
-        $message = new Message(
-            headers: ['header-key' => 'header-value'],
-            body: ['name' => 'log', 'data' => $log],
-            key: 'auth'  
-        );
 
-        Kafka::publishOn('logger')->withMessage($message);
+        $payload = [
+            'name' => 'log',
+            'data' => $log
+        ];
 
+        $conf = new \RdKafka\Conf();
+        $conf->set('log_level', config('kafka.debug'));
+        $conf->set('debug', 'all');
+        $rk = new \RdKafka\Producer($conf);
+        $rk->addBrokers(config('kafka.brokers'));
+        $topic = $rk->newTopic("logger");
+        $res = $topic->produce(RD_KAFKA_PARTITION_UA, 0, json_encode($payload));
+        $rk->flush(1000);
     }
 }

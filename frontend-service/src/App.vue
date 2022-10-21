@@ -59,7 +59,7 @@ export default{
       const payload = {
         action: "log",
         log: {
-          name: "frontend",
+          name: "log",
           data: "This is a log from frontend"
         }
       }

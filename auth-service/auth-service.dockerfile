@@ -14,8 +14,6 @@ RUN apk update \
     && php /tmp/composer-setup.php --no-ansi --install-dir=/usr/local/bin --filename=composer \
     && rm -rf /tmp/composer-setup.php
 
-RUN composer require mateusjunges/laravel-kafka
-
 WORKDIR /var/www
 COPY . .
 

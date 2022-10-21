@@ -10,6 +10,7 @@ services:
     build: 
       context: ./listener-service
       dockerfile: listener-service.dockerfile
+    restart: unless-stopped
     environment:
       kafkaURL: kafka:9092
       topic: logger
@@ -23,6 +24,10 @@ services:
       dockerfile: logger-service.dockerfile
     ports:
       - "3500:3500"
+    environment:
+      mongoURL: mongodb://mongo:27017
+      dbName: demo_app
+      collectionName: logger_db
   broker-service:
     build: 
       context: ./broker-service

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -22,14 +21,17 @@ type JsonResponse struct {
 func HandleRequest(c echo.Context) error {
 	params := new(RequestPayload)
 	if err := c.Bind(params); err != nil {
-		return c.String(http.StatusBadRequest, fmt.Sprintf("Unable to process data: %v", err.Error()))
+		return c.String(http.StatusBadRequest, err.Error())
 	}
-
+	fmt.Println(params)
 	mongo := NewMongoClient()
-	mongo.Save(Payload{
+	_, err := mongo.Save(Payload{
 		Name: params.Name,
 		Data: params.Data,
 	})
+	if err != nil {
+		return c.String(http.StatusBadRequest, err.Error())
+	}
 
 	resp := JsonResponse{
 		Error:   false,
@@ -37,7 +39,7 @@ func HandleRequest(c echo.Context) error {
 		Message: "logged",
 	}
 
-	return c.JSON(http.StatusAccepted, resp)
+	return c.JSON(http.StatusOK, resp)
 }
 
 func HandleLogs(c echo.Context) error {
@@ -46,13 +48,13 @@ func HandleLogs(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadGateway, err.Error())
 	}
-	j, err := json.Marshal(data)
+	// j, err := json.Marshal(data)
 	if err != nil {
 		return c.JSON(http.StatusBadGateway, err.Error())
 	}
 	resp := JsonResponse{
 		Error:   false,
-		Data:    j,
+		Data:    data,
 		Message: "logs",
 	}
 	return c.JSON(http.StatusOK, resp)

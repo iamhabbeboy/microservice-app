@@ -35,6 +35,10 @@ type JsonResponse struct {
 	Data    any    `string:"data,omitempty"`
 }
 
+type LogEntry struct {
+	Data any
+}
+
 func HandleHealthTest(c echo.Context) error {
 	return c.String(http.StatusOK, "All is well from Broker")
 }
@@ -61,8 +65,7 @@ func HandleRequest(c echo.Context) error {
 
 func getLogs() JsonResponse {
 	// call the service
-	req, err := http.Get("http://logger-service/")
-	fmt.Println(err)
+	req, err := http.Get("http://logger-service:3500/logs")
 	if err != nil {
 		return statusResponse(true, err.Error())
 	}
@@ -71,11 +74,15 @@ func getLogs() JsonResponse {
 	if err != nil {
 		return statusResponse(true, err.Error())
 	}
-
+	var log LogEntry
+	err = json.Unmarshal(body, &log)
+	if err != nil {
+		return statusResponse(true, err.Error())
+	}
 	var p JsonResponse
 	p.Error = false
 	p.Message = "logged"
-	p.Data = string(body)
+	p.Data = log
 
 	return p
 }

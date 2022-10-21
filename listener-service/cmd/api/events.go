@@ -88,7 +88,10 @@ func (e *Event) Get() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		handlePayload(payload)
+		err = handlePayload(payload)
+		if err != nil {
+			log.Fatal(err)
+		}
 		// data, err := e.mongodb.Save(payload)
 		// if err != nil {
 		// 	log.Fatal("Unable:: ", err)
